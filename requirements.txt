@@ -8,3 +8,4 @@ plotly
 yfinance
 joblib
 gunicorn
+Flask-Caching
