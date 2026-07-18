@@ -7,7 +7,6 @@ class Config:
     MODEL_DIR = BASE_DIR / "model"
     MODEL_PATH = MODEL_DIR / "lstm_ga_brent.keras"
     SCALER_PATH = MODEL_DIR /"scaler.pkl"
-    MODEL_INFO = MODEL_DIR / "model_info.pkl"
     TICKER = 'BZ=F'
     START_DATE = "2022-12-30"
     TIME_STEP = 60
