@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Brent Oil Price Prediction{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% macro nav_link(endpoint, icon, label) -%}
+{% set is_active = request.endpoint == endpoint %}
+
+<li class="nav-item">
+    <a class="nav-link{% if is_active %} active{% endif %}" href="{{ url_for(endpoint) }}" {% if is_active %}aria-current="page"{% endif %}>
+        <i class="bi {{ icon }}"></i>
+        <span>{{ label }}</span>
+    </a>
+</li>
+{%- endmacro %}
+
+{% macro nav_links() -%}
+<ul class="nav flex-column sidebar-nav">
+    {{ nav_link('dashboard.dashboard', 'bi-speedometer2', 'Dashboard') }}
+    {{ nav_link('history.history', 'bi-table', 'History') }}
+    {{ nav_link('forecast.forecast', 'bi-graph-up-arrow', 'Forecast') }}
+    {{ nav_link('model.model', 'bi-cpu', 'Model') }}
+</ul>
+{%- endmacro %}
+
+<div class="container-fluid">
+    <div class="row g-0 min-vh-100">
+        <aside class="col-md-3 col-lg-2 d-none d-md-flex sidebar-shell">
+            <nav class="sidebar h-100 w-100">
+                <div class="sidebar-header">
+                    <h4 class="mb-1">Brent Crude Oil</h4>
+                    <small>LSTM + GA</small>
+                </div>
+                <div class="sidebar-body">
+                    {{ nav_links() }}
+                </div>
+            </nav>
+        </aside>
+
+        <div class="offcanvas offcanvas-start d-md-none sidebar offcanvas-sidebar" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+            <div class="offcanvas-header sidebar-header">
+                <div>
+                    <h4 class="mb-1" id="sidebarOffcanvasLabel">Brent Crude Oil</h4>
+                    <small>LSTM + GA</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+                {{ nav_links() }}
+            </div>
+        </div>
+
+        <main class="col-12 col-md-9 col-lg-10 content-shell">
+            <div class="mobile-topbar d-md-none sticky-top">
+                <button class="btn btn-dark mobile-menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" aria-label="Open navigation menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="mobile-topbar-title">
+                    <strong>Brent Crude Oil</strong>
+                    <small>LSTM + GA</small>
+                </div>
+            </div>
+
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

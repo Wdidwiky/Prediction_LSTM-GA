@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="mb-1">Dashboard</h2>
+    <p class="text-muted mb-0">Model performance for Brent crude oil price predictions.</p>
+</div>
+
+<div class="alert brent-info border-0 d-flex gap-3 align-items-start mb-4" role="note">
+    <i class="bi bi-droplet-fill mt-1"></i>
+    <div>
+        <strong>About Brent Crude Oil</strong>
+        <p class="mb-0">Brent Crude adalah salah satu acuan harga minyak mentah global, terutama untuk pasar Eropa, Afrika, dan Timur Tengah. Pergerakan harganya dipengaruhi oleh pasokan, permintaan dunia, kondisi geopolitik, serta nilai tukar.</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card metric-card shadow-sm h-100" title="Harga penutupan terbaru Brent Crude Oil pada data yang digunakan dashboard." aria-label="Harga penutupan terbaru Brent Crude Oil pada data yang digunakan dashboard.">
+            <div class="card-body d-flex align-items-center gap-3">
+                <span class="metric-icon metric-primary"><i class="bi bi-currency-dollar"></i></span>
+                <div><span class="metric-label">Current Price</span><h4 class="mb-0">{{ current_price }}</h4></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card metric-card shadow-sm h-100" title="RMSE mengukur besar kesalahan prediksi. Nilai lebih kecil berarti prediksi lebih akurat." aria-label="RMSE mengukur besar kesalahan prediksi. Nilai lebih kecil berarti prediksi lebih akurat.">
+            <div class="card-body d-flex align-items-center gap-3">
+                <span class="metric-icon metric-primary"><i class="bi bi-bullseye"></i></span>
+                <div><span class="metric-label">RMSE</span><h4 class="mb-0">{{ '%.2f'|format(metrics.rmse) }}</h4></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card metric-card shadow-sm h-100" title="MAE adalah rata-rata selisih absolut antara harga aktual dan prediksi. Nilai lebih kecil lebih baik." aria-label="MAE adalah rata-rata selisih absolut antara harga aktual dan prediksi. Nilai lebih kecil lebih baik.">
+            <div class="card-body d-flex align-items-center gap-3">
+                <span class="metric-icon metric-success"><i class="bi bi-graph-down-arrow"></i></span>
+                <div><span class="metric-label">MAE</span><h4 class="mb-0">{{ '%.2f'|format(metrics.mae) }}</h4></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card metric-card shadow-sm h-100" title="MAPE menunjukkan rata-rata persentase kesalahan prediksi. Nilai lebih kecil lebih baik." aria-label="MAPE menunjukkan rata-rata persentase kesalahan prediksi. Nilai lebih kecil lebih baik.">
+            <div class="card-body d-flex align-items-center gap-3">
+                <span class="metric-icon metric-warning"><i class="bi bi-percent"></i></span>
+                <div><span class="metric-label">MAPE</span><h4 class="mb-0">{{ '%.2f'|format(metrics.mape) }}%</h4></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card metric-card shadow-sm h-100" title="R² menunjukkan seberapa baik model menjelaskan perubahan harga aktual. Semakin mendekati 1, semakin baik." aria-label="R² menunjukkan seberapa baik model menjelaskan perubahan harga aktual. Semakin mendekati 1, semakin baik.">
+            <div class="card-body d-flex align-items-center gap-3">
+                <span class="metric-icon metric-info"><i class="bi bi-bar-chart-line"></i></span>
+                <div><span class="metric-label">R² Score</span><h4 class="mb-0">{{ '%.4f'|format(metrics.r2) }}</h4></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Actual vs Prediction</h5>
+        <small class="text-muted">Perbandingan harga aktual Brent Crude Oil dengan hasil prediksi model LSTM + GA.</small>
+    </div>
+    <div class="card-body">{{ actual_prediction_graph|safe }}</div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3"><h5 class="mb-0">Forecast: Next 14 Days</h5></div>
+    <div class="card-body">{{ forecast_graph|safe }}</div>
+</div>
+{% endblock %}

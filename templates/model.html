@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Dokumentasi Model{% endblock %}
+
+{% block content %}
+<div class="model-docs">
+    <header class="docs-header mb-4">
+        <h1 class="mb-2">LSTM Brent Price Forecaster</h1>
+        <p class="mb-0">Dokumentasi konfigurasi, arsitektur, dan performa model prediksi harga minyak Brent.</p>
+    </header>
+
+    <div>
+        <section id="ringkasan" class="docs-section">
+            <h2>Ringkasan model</h2>
+            <p>Model memakai dua layer LSTM untuk mempelajari pola harga penutupan dari 60 hari sebelumnya. Genetic Algorithm memilih konfigurasi yang memberikan RMSE validasi terendah.</p>
+            <div class="docs-code-card">
+                <div class="docs-code-title"><span>Model: <strong>"sequential"</strong></span><span class="badge">LSTM + GA</span></div>
+                <pre><code>Model: "sequential"
+Input shape: (None, 60, 1)
+Output shape: (None, 1)
+Total params: 198,273
+Trainable params: 198,273
+Optimizer: Adam</code></pre>
+            </div>
+        </section>
+
+        <section id="arsitektur" class="docs-section">
+            <h2>Arsitektur model</h2>
+            <p>Susunan layer model final setelah konfigurasi terbaik diterapkan.</p>
+            <div class="docs-code-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="docs-table docs-summary-table architecture-docs-table mb-0">
+                        <colgroup>
+                            <col class="architecture-layer-col">
+                            <col class="architecture-config-col">
+                            <col class="architecture-output-col">
+                            <col class="architecture-params-col">
+                        </colgroup>
+                        <thead><tr><th>Layer</th><th>Configuration</th><th>Output Shape</th><th>Parameter</th></tr></thead>
+                        <tbody>{% for layer, config, output, params in architecture %}<tr><td><strong>{{ layer }}</strong></td><td>{{ config }}</td><td>{{ output }}</td><td>{{ params }}</td></tr>{% endfor %}</tbody>
+                        <tfoot><tr><th colspan="3">Total Parameter</th><th>198,273</th></tr></tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="dataset-split" class="docs-section">
+            <h2>Training, Validation, dan Testing Data</h2>
+            <p>Pembagian data menggunakan rasio 70:15:15 seperti proses training model.</p>
+            <div class="docs-chart-card">{{ dataset_split_graph|safe }}</div>
+        </section>
+
+        <section id="hyperparameter" class="docs-section">
+            <h2>Hyperparameter terbaik (GA)</h2>
+            <p>Konfigurasi berikut dipilih dari proses optimasi Genetic Algorithm.</p>
+            <div class="ga-config-card mb-3">
+                <div class="ga-config-heading">
+                    <span class="ga-config-icon"><i class="bi bi-diagram-3"></i></span>
+                    <div><h3>Genetic Algorithm</h3><p>Konfigurasi proses pencarian hyperparameter model.</p></div>
+                </div>
+                <div class="ga-config-grid">
+                    {% for label, value in ga_configuration %}<div><span>{{ label }}</span><strong>{{ value }}</strong></div>{% endfor %}
+                </div>
+            </div>
+            <div class="docs-table-wrap">
+                <table class="docs-table">
+                    <thead><tr><th>Hyperparameter</th><th>Nilai terbaik</th><th>Nilai kandidat</th></tr></thead>
+                    <tbody>{% for row in hyperparameter_rows %}<tr><td>{{ row.label }}</td><td><code>{{ row.best }}</code></td><td><code>[{{ row.candidates | join(', ') }}]</code></td></tr>{% endfor %}</tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="chromosome" class="docs-section">
+            <h2>Chromosome representation</h2>
+            <p>Setiap chromosome merepresentasikan satu kandidat konfigurasi model. Gen di dalam chromosome menyimpan hyperparameter yang diuji oleh Genetic Algorithm, sehingga satu chromosome dapat dibaca sebagai satu solusi utuh yang dievaluasi berdasarkan validation RMSE.</p>
+            <div class="docs-table-wrap">
+                <table class="docs-table">
+                    <thead>
+                        <tr>
+                            <th>Gen</th>
+                            <th>Parameter</th>
+                            <th>Peran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Gene 1</td><td>Unit LSTM</td><td>Menentukan kapasitas memori model.</td></tr>
+                        <tr><td>Gene 2</td><td>Dropout</td><td>Mengontrol regularisasi pada layer LSTM.</td></tr>
+                        <tr><td>Gene 3</td><td>Learning rate</td><td>Mengatur kecepatan pembaruan bobot.</td></tr>
+                        <tr><td>Gene 4</td><td>Batch size</td><td>Menentukan jumlah sampel per iterasi training.</td></tr>
+                        <tr><td>Gene 5</td><td>Epoch</td><td>Menentukan jumlah siklus training maksimal.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="docs-code-card mt-3">
+                <div class="docs-code-title"><span>Contoh chromosome</span><span class="badge">Kandidat solusi</span></div>
+                <pre><code>[128, 0.15, 0.001, 16, 100]</code></pre>
+                <p class="docs-note mb-0">Urutan nilai tersebut merepresentasikan unit LSTM, dropout, learning rate, batch size, dan epoch untuk satu kandidat model.</p>
+            </div>
+        </section>
+
+        <section id="evolution-process" class="docs-section">
+            <h2>Evolution process</h2>
+            <p>Proses evolusi bergerak dari populasi awal menuju populasi baru melalui evaluasi fitness, seleksi, crossover, dan mutasi. Setiap siklus menghasilkan generasi kandidat yang semakin mendekati konfigurasi optimal.</p>
+            <div class="docs-chart-card mb-3">
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge text-bg-light border">1. Inisialisasi populasi</span>
+                        <span class="text-muted">-&gt;</span>
+                        <span class="badge text-bg-light border">2. Evaluasi fitness</span>
+                        <span class="text-muted">-&gt;</span>
+                        <span class="badge text-bg-light border">3. Seleksi</span>
+                        <span class="text-muted">-&gt;</span>
+                        <span class="badge text-bg-light border">4. Crossover</span>
+                        <span class="text-muted">-&gt;</span>
+                        <span class="badge text-bg-light border">5. Mutasi</span>
+                        <span class="text-muted">-&gt;</span>
+                        <span class="badge text-bg-light border">6. Generasi baru</span>
+                    </div>
+                    <div class="border rounded-3 bg-white p-3">
+                        <div class="fw-semibold mb-2">Contoh alur satu iterasi</div>
+                        <div class="small text-muted mb-2">Populasi awal: <code>[128, 0.15, 0.001, 16, 100]</code> dan kandidat lain dengan variasi parameter.</div>
+                        <div class="small text-muted mb-2">Kandidat dievaluasi menggunakan validation RMSE, lalu parent terbaik dipilih untuk menghasilkan offspring baru.</div>
+                        <div class="small text-muted">Offspring kemudian dimutasi secara terbatas sebelum masuk ke generasi berikutnya.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="docs-table-wrap">
+                <table class="docs-table">
+                    <thead>
+                        <tr>
+                            <th>Langkah</th>
+                            <th>Tahap</th>
+                            <th>Penjelasan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Inisialisasi populasi</td><td>Membangun kandidat solusi awal dengan kombinasi hyperparameter acak.</td></tr>
+                        <tr><td>2</td><td>Evaluasi fitness</td><td>Mengukur setiap kandidat menggunakan validation RMSE.</td></tr>
+                        <tr><td>3</td><td>Seleksi</td><td>Memilih individu terbaik untuk menjadi parent generasi berikutnya.</td></tr>
+                        <tr><td>4</td><td>Crossover</td><td>Menggabungkan gen parent untuk menghasilkan kombinasi baru.</td></tr>
+                        <tr><td>5</td><td>Mutasi</td><td>Memberi variasi kecil agar pencarian tidak terjebak pada solusi lokal.</td></tr>
+                        <tr><td>6</td><td>Generasi baru</td><td>Mengevaluasi hasil offspring dan mengulangi proses sampai konvergen.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="ga-convergence" class="docs-section">
+            <h2>GA Convergence</h2>
+            <p>Kurva konvergensi dari {{ generations }} generasi GA. Garis biru menunjukkan RMSE terbaik, sedangkan garis putus-putus menunjukkan rata-rata RMSE populasi.</p>
+            <div class="docs-chart-card">{{ learning_curve|safe }}</div>
+            <p class="docs-note mb-0"><i class="bi bi-info-circle me-1"></i>RMSE validasi terbaik selama pencarian GA: <strong>{{ '%.4f'|format(best_ga_rmse) }}</strong>.</p>
+        </section>
+
+        <section id="performa" class="docs-section">
+            <h2>Performance metrics</h2>
+            <p>Performa dihitung ulang dari data terbaru hingga <strong>{{ evaluation_date }}</strong>, menggunakan nilai aktual dan prediksi yang sama dengan dashboard.</p>
+            <div class="docs-table-wrap">
+                <table class="docs-table">
+                    <thead><tr><th>Metrik</th><th>Nilai</th><th>Deskripsi</th></tr></thead>
+                    <tbody>
+                        <tr><td>RMSE</td><td><code>{{ '%.2f'|format(metrics.rmse) }}</code></td><td>Besarnya kesalahan prediksi.</td></tr>
+                        <tr><td>MAE</td><td><code>{{ '%.2f'|format(metrics.mae) }}</code></td><td>Rata-rata selisih absolut.</td></tr>
+                        <tr><td>MAPE</td><td><code>{{ '%.2f'|format(metrics.mape) }}%</code></td><td>Rata-rata persentase kesalahan.</td></tr>
+                        <tr><td>R² Score</td><td><code>{{ '%.4f'|format(metrics.r2) }}</code></td><td>Kesesuaian prediksi terhadap data aktual.</td></tr>
+                        <tr><td>Validation Loss</td><td><code>{{ '%.7f'|format(metrics.validation_loss) }}</code></td><td>Loss validasi (MSE) terbaik pada epoch ke-77 saat training.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}
