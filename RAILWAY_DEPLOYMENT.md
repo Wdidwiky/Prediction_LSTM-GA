@@ -6,6 +6,7 @@
 - `requirements.txt` contains production dependencies for Railway's Python build.
 - `runtime.txt` requests Python 3.11.
 - `gunicorn.conf.py` binds Gunicorn to Railway's `PORT` environment variable.
+- `model/lstm_ga_brent.h5` is loaded lazily when prediction endpoints are requested, not during server startup.
 
 ## Railway variables
 
