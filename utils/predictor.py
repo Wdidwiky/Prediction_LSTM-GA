@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 from extensions import cache
+from config import Config
 from utils.data_loader import load_history
 from utils.preprocessing import create_dataset
 
@@ -16,7 +17,7 @@ def predict():
     close.columns = ["Close"]
 
     scaled = SCALER.transform(close.to_numpy())
-    time_step = 60
+    time_step = Config.TIME_STEP
     X = create_dataset(scaled, time_step)
     pred = MODEL.predict(X, verbose=0)
     pred = SCALER.inverse_transform(pred)

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-import yfinance as yf
 
+from config import Config
 from utils.data_loader import load_history
 from utils.model_loader import MODEL, SCALER
 
@@ -12,7 +12,7 @@ def forecast_next_days(days=14):
     close = pd.DataFrame(close)
     close.columns = ["Close"]
 
-    time_step = 60
+    time_step = Config.TIME_STEP
     scaled = SCALER.transform(close.to_numpy())
     window = scaled[-time_step:]
     forecast = []

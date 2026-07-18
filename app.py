@@ -17,17 +17,23 @@ app.register_blueprint(history_bp)
 app.register_blueprint(forecast_bp)
 app.register_blueprint(model_bp)
 
+
+@app.route("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template(
         "404.html"
-    ),404
+    ), 404
 
 @app.errorhandler(500)
 def internal_error(e):
     return render_template(
         "500.html"
-    ),500
+    ), 500
 
 if __name__ == '__main__':
     app.run()
